@@ -97,30 +97,46 @@ export class FeedManagementService {
 
 
         async fetchAllFeedLocation(
-        page: any,
-        pageSize: any,
     ): Promise<any> {
         try {
 
-            const skip = (page - 1) * pageSize;
-            const limit = pageSize;
-
-            const feedsLocation = await this.FeedItemManagementModel.find().select('locations')
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
+            const feedsLocation = await this.FeedItemManagementModel.find().select('locations  -_id')
                 .lean();
-
-
-            const totalRecords = await this.FeedItemManagementModel.countDocuments();
 
             return {
                 result: 'Feeds Location fetched successfully',
                 data: true,
                 body: feedsLocation,
-                currentPage: page,
-                totalPages: Math.ceil(totalRecords / pageSize),
-                totalRecords,
+                status: HttpStatus.OK,
+            };
+
+        } catch (error) {
+            return {
+                result: error.message,
+                data: false,
+                body: null,
+                status:
+                    error instanceof CustomError
+                        ? error.statusCode
+                        : HttpStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+    }
+
+    async fetchFeedLocationWithCoordinate(
+        latitude: any,
+        longitude: any,
+    ): Promise<any> {
+        try {
+
+            const feedsLocation = await this.FeedItemManagementModel.find().lean();
+
+
+
+            return {
+                result: 'Feeds Location fetched successfully',
+                data: true,
+                body: feedsLocation,
                 status: HttpStatus.OK,
             };
 

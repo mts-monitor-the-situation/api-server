@@ -104,34 +104,23 @@ export class FeedManagementController {
     }
 
 
-     @Get('fetch-all-feed-items-location/:page/:pageSize')
+     @Get('fetch-all-feed-items-location')
     @SwaggerEndpoint(
-        'Fetch Feeds',
-        [
-            { name: 'page', description: 'The page number for pagination' },
-            { name: 'pageSize', description: 'The number of items per page' }
-        ],       
+        'Fetch Feeds',      
+        undefined,     
         undefined,     
         undefined
     )
 
     async fetchAllFeedLocation(
-        @Param('page') page: number,
-        @Param('pageSize') pageSize: number,
         @Res() res: any
     ): Promise<any> {
         try {
-            const result = await this.feedManagementService.fetchAllFeedLocation(
-                page,
-                pageSize
-            );
+            const result = await this.feedManagementService.fetchAllFeedLocation();
             const {
                 data,
                 result: responseResult,
                 body: responseBody,
-                currentPage,
-                totalPages,
-                totalRecords,
                 status,
             } = result;
             if (data) {
@@ -139,9 +128,52 @@ export class FeedManagementController {
                     body: responseBody,
                     result: responseResult,
                     isData: data,
-                    currentPage,
-                    totalPages,
-                    totalRecords,
+                });
+            } else {
+                throw { message: responseResult, status, data, responseBody };
+            }
+        } catch (error) {
+            const { data, message, responseBody, status } = error;
+            res.status(status).json({
+                body: responseBody,
+                result: message,
+                isData: data,
+            });
+        }
+    }
+
+         @Get('fetch-unique-feed-item-location')
+    @SwaggerEndpoint(
+        'Fetch Feeds',
+        [
+            { name: 'latitude', description: 'latitude of location' },
+            { name: 'longitude', description: 'longitude of location' }
+        ],        
+        undefined,     
+        undefined
+    )
+
+    async fetchFeedLocationWithCoordinate(
+        @Query('latitude') latitude: any,
+        @Query('longitude') longitude: any,
+        @Res() res: any
+    ): Promise<any> {
+        try {
+            const result = await this.feedManagementService.fetchFeedLocationWithCoordinate(
+                latitude,
+                longitude
+            );
+            const {
+                data,
+                result: responseResult,
+                body: responseBody,
+                status,
+            } = result;
+            if (data) {
+                res.status(status).json({
+                    body: responseBody,
+                    result: responseResult,
+                    isData: data,
                 });
             } else {
                 throw { message: responseResult, status, data, responseBody };
