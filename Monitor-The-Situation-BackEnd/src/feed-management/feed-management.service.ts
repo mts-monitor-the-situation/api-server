@@ -3,7 +3,7 @@ import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { FeedItemModelSchemaName } from 'src/model-management/feed-mangementmodel';
 import { CustomError } from 'src/shared-management/utility/status-code';
-
+import escapeRegExp from 'lodash/escapeRegExp';
 @Injectable()
 export class FeedManagementService {
 
@@ -52,10 +52,10 @@ export class FeedManagementService {
             let baseFilter: any = {};
 
             if (title) {
-                baseFilter.title = { $regex: new RegExp(title, 'i') };
+                baseFilter.title = { $regex: new RegExp(escapeRegExp(title), 'i') };
             }
             if (feedCategories) {
-                baseFilter['feedCategories.name'] = { $regex: new RegExp(feedCategories, 'i') };
+                baseFilter['feedCategories.name'] = { $regex: new RegExp(escapeRegExp(feedCategories), 'i') };
             }
 
             const skip = (page - 1) * pageSize;
